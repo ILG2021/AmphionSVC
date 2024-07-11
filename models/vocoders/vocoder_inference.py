@@ -4,6 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 
 import os
+import sys
+
 import torch
 import json
 import json5
@@ -179,27 +181,33 @@ class VocoderInference(object):
         utts = []
         mels = glob(os.path.join(self.args.feature_folder, "mels", "*.npy"))
         for i, mel in enumerate(mels):
-            uid = mel.split("/")[-1].split(".")[0]
+            if sys.platform == 'win32':
+                uid = mel.split("\\")[-1].split(".")[0]
+            else:
+                uid = mel.split("/")[-1].split(".")[0]
             utt = {"Dataset": "tmp", "Uid": uid, "index": i}
             utts.append(utt)
 
         os.makedirs(os.path.join(self.cfg.preprocess.processed_dir, "tmp"))
         with open(
-            os.path.join(self.cfg.preprocess.processed_dir, "tmp", "test.json"), "w"
+                os.path.join(self.cfg.preprocess.processed_dir, "tmp", "test.json"), "w"
         ) as f:
             json.dump(utts, f)
 
         meta_info = {"dataset": "tmp", "test": {"size": len(utts)}}
 
         with open(
-            os.path.join(self.cfg.preprocess.processed_dir, "tmp", "meta_info.json"),
-            "w",
+                os.path.join(self.cfg.preprocess.processed_dir, "tmp", "meta_info.json"),
+                "w",
         ) as f:
             json.dump(meta_info, f)
 
         features = glob(os.path.join(self.args.feature_folder, "*"))
         for feature in features:
-            feature_name = feature.split("/")[-1]
+            if sys.platform == "win32":
+                feature_name = feature.split("\\")[-1]
+            else:
+                feature_name = feature.split("/")[-1]
             if os.path.isfile(feature):
                 continue
             shutil.copytree(
@@ -214,21 +222,24 @@ class VocoderInference(object):
         utts = []
         audios = glob(os.path.join(self.args.audio_folder, "*"))
         for i, audio in enumerate(audios):
-            uid = audio.split("/")[-1].split(".")[0]
+            if sys.platform == 'win32':
+                uid = audio.split("\\")[-1].split(".")[0]
+            else:
+                uid = audio.split("/")[-1].split(".")[0]
             utt = {"Dataset": "tmp", "Uid": uid, "index": i, "Path": audio}
             utts.append(utt)
 
         os.makedirs(os.path.join(self.cfg.preprocess.processed_dir, "tmp"))
         with open(
-            os.path.join(self.cfg.preprocess.processed_dir, "tmp", "test.json"), "w"
+                os.path.join(self.cfg.preprocess.processed_dir, "tmp", "test.json"), "w"
         ) as f:
             json.dump(utts, f)
 
         meta_info = {"dataset": "tmp", "test": {"size": len(utts)}}
 
         with open(
-            os.path.join(self.cfg.preprocess.processed_dir, "tmp", "meta_info.json"),
-            "w",
+                os.path.join(self.cfg.preprocess.processed_dir, "tmp", "meta_info.json"),
+                "w",
         ) as f:
             json.dump(meta_info, f)
 
@@ -283,10 +294,16 @@ class VocoderInference(object):
                     for i in Path(checkpoint_dir).glob("*")
                     if not "audio" in str(i)
                 ]
-                ls.sort(
-                    key=lambda x: int(x.split("/")[-1].split("_")[0].split("-")[-1]),
-                    reverse=True,
-                )
+                if sys.platform == 'win32':
+                    ls.sort(
+                        key=lambda x: int(x.split("\\")[-1].split("_")[0].split("-")[-1]),
+                        reverse=True,
+                    )
+                else:
+                    ls.sort(
+                        key=lambda x: int(x.split("/")[-1].split("_")[0].split("-")[-1]),
+                        reverse=True,
+                    )
                 checkpoint_path = ls[0]
             accelerate.load_checkpoint_and_dispatch(
                 self.accelerator.unwrap_model(self.model),
@@ -317,8 +334,8 @@ class VocoderInference(object):
                         k.split("module.")[-1]: v
                         for k, v in pretrained_generator_dict.items()
                         if (
-                            k.split("module.")[-1] in generator_dict
-                            and v.shape == generator_dict[k.split("module.")[-1]].shape
+                                k.split("module.")[-1] in generator_dict
+                                and v.shape == generator_dict[k.split("module.")[-1]].shape
                         )
                     }
 
@@ -395,10 +412,10 @@ class VocoderInference(object):
 
 
 def load_nnvocoder(
-    cfg,
-    vocoder_name,
-    weights_file,
-    from_multi_gpu=False,
+        cfg,
+        vocoder_name,
+        weights_file,
+        from_multi_gpu=False,
 ):
     """Load the specified vocoder.
     cfg: the vocoder config filer.
@@ -420,16 +437,20 @@ def load_nnvocoder(
                     else torch.device("cpu")
                 ),
             )
+
             if from_multi_gpu:
-                pretrained_generator_dict = ckpt["generator_state_dict"]
+                if "generator_state_dict" in ckpt:
+                    pretrained_generator_dict = ckpt["generator_state_dict"]
+                else:
+                    pretrained_generator_dict = ckpt["generator"]
                 generator_dict = model.state_dict()
 
                 new_generator_dict = {
                     k.split("module.")[-1]: v
                     for k, v in pretrained_generator_dict.items()
                     if (
-                        k.split("module.")[-1] in generator_dict
-                        and v.shape == generator_dict[k.split("module.")[-1]].shape
+                            k.split("module.")[-1] in generator_dict
+                            and v.shape == generator_dict[k.split("module.")[-1]].shape
                     )
                 }
 
@@ -469,13 +490,13 @@ def tensorize(data, device, n_samples):
 
 
 def synthesis(
-    cfg,
-    vocoder_weight_file,
-    n_samples,
-    pred,
-    f0s=None,
-    batch_size=64,
-    fast_inference=False,
+        cfg,
+        vocoder_weight_file,
+        n_samples,
+        pred,
+        f0s=None,
+        batch_size=64,
+        fast_inference=False,
 ):
     """Synthesis audios from a given vocoder and series of given features.
     cfg: vocoder config.

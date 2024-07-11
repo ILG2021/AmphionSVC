@@ -1,0 +1,1 @@
+python bins/svc/inference.py --config egs/svc/MultipleContentsSVC/exp_config.json --acoustics_dir ckpts/tommy --vocoder_dir ckpts/nsf-hifigan --target_singer tommy_tommy --trans_key autoshift --source ckpts/input --output_dir ckpts/output  --log_level debug

@@ -158,6 +158,12 @@ class BaseInference(object):
                 ).numpy(force=True)
                 for i in self.test_dataset.metadata
             ],
+            f0s=[
+                torch.from_numpy(
+                    np.load(os.path.join("data", i["Dataset"], "pitches", "{}.npy".format(i["Uid"])))
+                )
+                for i in self.test_dataset.metadata
+            ]
         )
 
         output_audio_files = []

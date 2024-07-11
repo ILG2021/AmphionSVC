@@ -5,9 +5,12 @@
 
 import argparse
 import os
+import sys
 
 import torch
 
+now_dir = os.getcwd()
+sys.path.append(now_dir)
 from models.vocoders.vocoder_inference import VocoderInference
 from utils.util import load_config
 

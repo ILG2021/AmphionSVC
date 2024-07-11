@@ -4,6 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 
 import os
+import shutil
+import zipfile
 from pathlib import Path
 import requests
 from huggingface_hub import hf_hub_download, snapshot_download
@@ -23,24 +25,15 @@ def dl_model(link, save_path):
 
 
 if __name__ == "__main__":
-    print("Downloading Amphion Singing BigVGAN...")
-    dl_model(
-        "https://huggingface.co/amphion/BigVGAN_singing_bigdata/resolve/main/bigvgan_singing/400000.pt",
-        BASE_DIR / "pretrained/bigvgan/400000.pt")
-    dl_model(
-        "https://huggingface.co/amphion/BigVGAN_singing_bigdata/resolve/main/bigvgan_singing/args.json",
-        BASE_DIR / "pretrained/bigvgan/args.json")
-
-    print("Downloading Amphion Speech HiFi-GAN...")
-    if not os.path.exists(BASE_DIR / "pretrained/hifigan/hifigan_speech/args.json"):
-        snapshot_download("amphion/hifigan_speech_bigdata", local_dir=BASE_DIR / "pretrained/hifigan",
-                          ignore_patterns="README.md")
-
-    print("Downloading Amphion DiffWave...")
-    if not os.path.exists(BASE_DIR / "pretrained/diffwave/diffwave_speech/args.json"):
-        snapshot_download("amphion/diffwave", local_dir=BASE_DIR / "pretrained/diffwave",
-                          ignore_patterns="README.md")
-        os.rename(BASE_DIR / "pretrained/diffwave/diffwave", BASE_DIR / "pretrained/diffwave/diffwave_speech")
+    print("Downloading OpenVPI nsf hifigan...")
+    if not os.path.exists("pretrained/nsf_hifigan/model.ckpt"):
+        dl_model(
+            "https://github.com/openvpi/vocoders/releases/download/nsf-hifigan-44.1k-hop512-128bin-2024.02/nsf_hifigan_44.1k_hop512_128bin_2024.02.zip",
+            "./pretrained/nsf_hifigan_44.1k_hop512_128bin_2024.02.zip")
+        # 解压文件到指定目录
+        with zipfile.ZipFile("./pretrained/nsf_hifigan_44.1k_hop512_128bin_2024.02.zip", "r") as zip_ref:
+            zip_ref.extractall("./pretrained")
+        shutil.move("./pretrained/nsf_hifigan_44.1k_hop512_128bin_2024.02", "./pretrained/nsf_hifigan")
 
     print("Downloading ContentVec...")
     dl_model(
@@ -49,11 +42,5 @@ if __name__ == "__main__":
 
     print("Downloading Whisper...")
     dl_model(
-        "https://openaipublic.azureedge.net/main/whisper/models/345ae4da62f9b3d59415adc60127b97c714f32e89e936602e85993674d08dcb1/medium.pt",
-        BASE_DIR / "pretrained/whisper/medium.pt")
-
-    print("Downloading RawNet3...")
-    dl_model(
-        "https://huggingface.co/jungjee/RawNet3/resolve/main/model.pt",
-        BASE_DIR / "pretrained/rawnet3/model.pt")
-    print("All models downloaded!")
+        "https://openaipublic.azureedge.net/main/whisper/models/81f7c96c852ee8fc832187b0132e569d6c3065a3252ed18e56effd0b6a73e524/large-v2.pt",
+        BASE_DIR / "pretrained/whisper/large-v2.pt")

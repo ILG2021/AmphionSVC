@@ -6,10 +6,16 @@
 import argparse
 import os
 import glob
+import platform
+import sys
+
 from tqdm import tqdm
 import json
 import torch
 import time
+
+now_dir = os.getcwd()
+sys.path.append(now_dir)
 
 from models.svc.diffusion.diffusion_inference import DiffusionInference
 from models.svc.comosvc.comosvc_inference import ComoSVCInference
@@ -234,7 +240,10 @@ def main():
         # Infer for every file as dataset
         output_root_path = args.output_dir
         for audio_path in tqdm(audio_list):
-            audio_name = audio_path.split("/")[-1].split(".")[0]
+            if sys.platform == 'win32':
+                audio_name = audio_path.split("\\")[-1].split(".")[0]
+            else:
+                audio_name = audio_path.split("/")[-1].split(".")[0]
             args.output_dir = os.path.join(output_root_path, audio_name)
             print("\n{}\nConversion for {}...\n".format("*" * 10, audio_name))
 
