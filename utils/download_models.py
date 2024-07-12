@@ -40,7 +40,3 @@ if __name__ == "__main__":
         "https://huggingface.co/LukeJacob2023/ContentVec/resolve/main/checkpoint_best_legacy_500.pt",
         BASE_DIR / "pretrained/contentvec/checkpoint_best_legacy_500.pt")
 
-    print("Downloading Whisper...")
-    dl_model(
-        "https://openaipublic.azureedge.net/main/whisper/models/81f7c96c852ee8fc832187b0132e569d6c3065a3252ed18e56effd0b6a73e524/large-v2.pt",
-        BASE_DIR / "pretrained/whisper/large-v2.pt")

@@ -303,7 +303,7 @@ class WhisperExtractor(AudioPretrainedModelFeaturesExtractor):
         # wavs: (batch, max_len)
         wavs = whisper.pad_or_trim(wavs)
         # batch_mel: (batch, 80, 3000)
-        batch_mel = whisper.log_mel_spectrogram(wavs, device=self.model.device)
+        batch_mel = whisper.log_mel_spectrogram(wavs, n_mels=128, device=self.model.device)
         with torch.no_grad():
             # (batch, 1500, 1024)
             features = self.model.embed_audio(batch_mel)

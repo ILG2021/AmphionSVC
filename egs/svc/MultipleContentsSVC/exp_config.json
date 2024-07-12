@@ -2,20 +2,14 @@
   "base_config": "config/svc/diffusion.json",
   "model_type": "DiffWaveNetSVC",
   "dataset": [
-    "m4singer",
-    "opencpop",
-    "opensinger",
-    "svcc",
-    "vctk"
+    "tommy"
   ],
   "dataset_path": {
-    // TODO: Fill in your dataset path
-    "m4singer": "[M4Singer dataset path]",
-    "opencpop": "[Opencpop dataset path]",
-    "opensinger": "[OpenSinger dataset path]",
-    "svcc": "[SVCC dataset path]",
-    "vctk": "[VCTK dataset path]"
+    "tommy": "dataset_raw"
   },
+  "use_custom_dataset": [
+    "tommy"
+  ],
   // TODO: Fill in the output log path. The default value is "Amphion/ckpts/svc"
   "log_dir": "ckpts/svc",
   "preprocess": {
@@ -38,8 +32,8 @@
     "contentvec_file": "pretrained/contentvec/checkpoint_best_legacy_500.pt",
     "wenet_model_path": "pretrained/wenet/20220506_u2pp_conformer_exp/final.pt",
     "wenet_config": "pretrained/wenet/20220506_u2pp_conformer_exp/train.yaml",
-    "whisper_model": "medium",
-    "whisper_model_path": "pretrained/whisper/medium.pt",
+    "whisper_model": "large-v3",
+    "whisper_model_path": "pretrained/whisper/large-v3.pt",
     // Config for features usage
     "use_mel": true,
     "use_min_max_norm_mel": true,
